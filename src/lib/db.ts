@@ -75,8 +75,7 @@ export interface Settings {
   eveningReminderTime?: string;
 }
 
-// Database
-const db = new Dexie('PowerHourDB') as Dexie & {
+type PowerHourDB = Dexie & {
   dayPlans: EntityTable<DayPlan, 'id'>;
   goals: EntityTable<Goal, 'id'>;
   habits: EntityTable<Habit, 'id'>;
@@ -84,25 +83,52 @@ const db = new Dexie('PowerHourDB') as Dexie & {
   settings: EntityTable<Settings, 'id'>;
 };
 
-db.version(1).stores({
-  dayPlans: '++id, date',
-  goals: '++id, category',
-  habits: '++id',
-  scriptures: '++id, savedAt',
-  settings: '++id',
-});
+// Database - lazy initialization for SSR safety
+let _db: PowerHourDB | null = null;
 
-export { db };
+function getDB(): PowerHourDB {
+  if (typeof window === 'undefined') {
+    throw new Error('IndexedDB is not available on the server');
+  }
+  
+  if (!_db) {
+    _db = new Dexie('PowerHourDB') as PowerHourDB;
+
+    _db.version(1).stores({
+      dayPlans: '++id, date',
+      goals: '++id, category',
+      habits: '++id',
+      scriptures: '++id, savedAt',
+      settings: '++id',
+    });
+  }
+  
+  return _db;
+}
+
+// Proxy to lazily access the database
+export const db = new Proxy({} as PowerHourDB, {
+  get(_, prop) {
+    const database = getDB();
+    const value = database[prop as keyof PowerHourDB];
+    if (typeof value === 'function') {
+      return value.bind(database);
+    }
+    return value;
+  }
+});
 
 // Helper functions
 export async function getTodayPlan(): Promise<DayPlan | undefined> {
+  const database = getDB();
   const today = new Date().toISOString().split('T')[0];
-  return db.dayPlans.where('date').equals(today).first();
+  return database.dayPlans.where('date').equals(today).first();
 }
 
 export async function getOrCreateTodayPlan(): Promise<DayPlan> {
+  const database = getDB();
   const today = new Date().toISOString().split('T')[0];
-  let plan = await db.dayPlans.where('date').equals(today).first();
+  let plan = await database.dayPlans.where('date').equals(today).first();
   
   if (!plan) {
     const newPlan: Omit<DayPlan, 'id'> = {
@@ -116,7 +142,7 @@ export async function getOrCreateTodayPlan(): Promise<DayPlan> {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const id = await db.dayPlans.add(newPlan as DayPlan);
+    const id = await database.dayPlans.add(newPlan as DayPlan);
     plan = { ...newPlan, id } as DayPlan;
   }
   
@@ -124,21 +150,24 @@ export async function getOrCreateTodayPlan(): Promise<DayPlan> {
 }
 
 export async function updateDayPlan(id: number, updates: Partial<DayPlan>): Promise<void> {
-  await db.dayPlans.update(id, { ...updates, updatedAt: new Date() });
+  const database = getDB();
+  await database.dayPlans.update(id, { ...updates, updatedAt: new Date() });
 }
 
 export async function getWeekPlans(startDate: Date): Promise<DayPlan[]> {
+  const database = getDB();
   const dates: string[] = [];
   for (let i = 0; i < 7; i++) {
     const date = new Date(startDate);
     date.setDate(date.getDate() + i);
     dates.push(date.toISOString().split('T')[0]);
   }
-  return db.dayPlans.where('date').anyOf(dates).toArray();
+  return database.dayPlans.where('date').anyOf(dates).toArray();
 }
 
 export async function getSettings(): Promise<Settings> {
-  let settings = await db.settings.toCollection().first();
+  const database = getDB();
+  let settings = await database.settings.toCollection().first();
   if (!settings) {
     const defaultSettings: Omit<Settings, 'id'> = {
       theme: 'system',
@@ -146,13 +175,14 @@ export async function getSettings(): Promise<Settings> {
       workdayEnd: 22,
       notificationsEnabled: false,
     };
-    const id = await db.settings.add(defaultSettings as Settings);
+    const id = await database.settings.add(defaultSettings as Settings);
     settings = { ...defaultSettings, id } as Settings;
   }
   return settings;
 }
 
 export async function updateSettings(updates: Partial<Settings>): Promise<void> {
+  const database = getDB();
   const settings = await getSettings();
-  await db.settings.update(settings.id!, updates);
+  await database.settings.update(settings.id!, updates);
 }
