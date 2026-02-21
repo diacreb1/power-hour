@@ -50,12 +50,14 @@ export default function TodayPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center gap-3"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-4"
         >
-          <Sparkles className="w-8 h-8 text-[hsl(var(--primary))] animate-pulse-soft" />
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">Loading your day...</p>
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(var(--gold)/0.2)] to-[hsl(var(--primary)/0.1)] flex items-center justify-center">
+            <Sparkles className="w-8 h-8 text-[hsl(var(--gold))] animate-pulse-soft" />
+          </div>
+          <p className="text-sm text-[hsl(var(--muted-foreground))] font-medium">Loading your day...</p>
         </motion.div>
       </div>
     );
@@ -67,7 +69,7 @@ export default function TodayPage() {
     <div className="min-h-screen pb-28">
       <Header showGreeting />
 
-      <main className="px-5 space-y-5 stagger-children">
+      <main className="px-5 space-y-6 stagger-children">
         {/* Daily Scripture */}
         <ScriptureCard compact />
 
@@ -78,6 +80,7 @@ export default function TodayPage() {
               icon={<Sunrise className="w-5 h-5" />}
               title="Morning Intention"
               subtitle="Start your day with purpose"
+              iconVariant="gold"
             />
             <TextArea
               value={plan.morningIntention}
@@ -95,6 +98,7 @@ export default function TodayPage() {
               icon={<Sparkles className="w-5 h-5" />}
               title="Morning Prayer"
               subtitle="Commit your day to God"
+              iconVariant="lavender"
             />
             <TextArea
               value={plan.morningPrayer}
@@ -111,6 +115,7 @@ export default function TodayPage() {
             icon={<Target className="w-5 h-5" />}
             title="Top 3 Priorities"
             subtitle="Focus on what matters most"
+            iconVariant="primary"
           />
           <PriorityList
             priorities={plan.priorities}
@@ -125,6 +130,7 @@ export default function TodayPage() {
             icon={<Clock className="w-5 h-5" />}
             title="Time Blocks"
             subtitle="Plan your hours"
+            iconVariant="primary"
           />
           <TimeBlocks
             timeBlocks={plan.timeBlocks}
@@ -140,6 +146,7 @@ export default function TodayPage() {
                 icon={<Moon className="w-5 h-5" />}
                 title="Evening Reflection"
                 subtitle="Review your day"
+                iconVariant="lavender"
               />
               <TextArea
                 value={plan.eveningReflection}
@@ -154,6 +161,7 @@ export default function TodayPage() {
                 icon={<Sparkles className="w-5 h-5" />}
                 title="Gratitude"
                 subtitle="Count your blessings"
+                iconVariant="sage"
               />
               <GratitudeList
                 items={plan.gratitude}
@@ -166,10 +174,10 @@ export default function TodayPage() {
 
         {/* Show condensed evening section in morning/afternoon */}
         {timeOfDay !== 'evening' && (
-          <Card variant="sage" delay={0.3} className="opacity-60">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--sage)/0.15)] flex items-center justify-center">
-                <Moon className="w-5 h-5 text-[hsl(var(--sage))]" />
+          <Card variant="sage" delay={0.3} className="opacity-70">
+            <div className="flex items-center gap-4">
+              <div className="icon-badge icon-badge-sage">
+                <Moon className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="font-semibold text-base">Evening Reflection</h3>

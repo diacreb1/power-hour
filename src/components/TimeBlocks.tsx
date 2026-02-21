@@ -66,7 +66,7 @@ export function TimeBlocks({
   return (
     <div className="space-y-2">
       <AnimatePresence mode="popLayout">
-        {relevantHours.map((hour) => {
+        {relevantHours.map((hour, index) => {
           const block = getBlockForHour(hour);
           const isPast = hour < currentHour;
           const isCurrent = hour === currentHour;
@@ -74,25 +74,34 @@ export function TimeBlocks({
           return (
             <motion.div
               key={hour}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ 
+                duration: 0.3, 
+                delay: index * 0.03,
+                ease: [0.25, 0.1, 0.25, 1] 
+              }}
               className={cn(
-                'flex items-center gap-3 p-3 rounded-xl transition-all',
+                'flex items-center gap-3 p-4 rounded-2xl transition-all duration-300',
                 isCurrent
-                  ? 'bg-[hsl(var(--primary)/0.1)] ring-1 ring-[hsl(var(--primary)/0.2)]'
-                  : 'bg-[hsl(var(--muted))]',
+                  ? 'bg-gradient-to-r from-[hsl(var(--primary)/0.08)] to-[hsl(var(--primary)/0.04)] ring-1 ring-[hsl(var(--primary)/0.15)]'
+                  : 'bg-[hsl(var(--muted)/0.5)] hover:bg-[hsl(var(--muted)/0.8)]',
                 isPast && 'opacity-50'
               )}
             >
               {/* Time label */}
               <div className="w-16 flex items-center gap-2 flex-shrink-0">
                 {isCurrent && (
-                  <div className="w-2 h-2 rounded-full bg-[hsl(var(--primary))] animate-pulse-soft" />
+                  <motion.div 
+                    className="w-2 h-2 rounded-full bg-[hsl(var(--primary))]"
+                    animate={{ scale: [1, 1.2, 1], opacity: [1, 0.6, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
                 )}
                 <span
                   className={cn(
-                    'text-sm font-medium',
+                    'text-sm font-semibold tabular-nums',
                     isCurrent
                       ? 'text-[hsl(var(--primary))]'
                       : 'text-[hsl(var(--muted-foreground))]'
@@ -104,17 +113,29 @@ export function TimeBlocks({
 
               {/* Checkbox */}
               {block?.task && (
-                <button
+                <motion.button
                   onClick={() => toggleBlock(hour)}
+                  whileTap={{ scale: 0.9 }}
                   className={cn(
-                    'w-5 h-5 rounded flex items-center justify-center transition-all haptic flex-shrink-0',
+                    'w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 haptic flex-shrink-0',
                     block.completed
-                      ? 'bg-[hsl(var(--sage))]'
-                      : 'border-2 border-[hsl(var(--border))] hover:border-[hsl(var(--sage))]'
+                      ? 'bg-gradient-to-br from-[hsl(var(--sage))] to-[hsl(158_40%_42%)] shadow-[0_2px_6px_hsl(var(--sage)/0.3)]'
+                      : 'border-2 border-[hsl(var(--border))] hover:border-[hsl(var(--sage))] hover:bg-[hsl(var(--sage)/0.05)]'
                   )}
                 >
-                  {block.completed && <Check className="w-3 h-3 text-white" />}
-                </button>
+                  <AnimatePresence mode="wait">
+                    {block.completed && (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -45 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        exit={{ scale: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
               )}
 
               {/* Task input */}
@@ -124,8 +145,9 @@ export function TimeBlocks({
                 onChange={(e) => updateBlock(hour, e.target.value)}
                 placeholder={isCurrent ? 'What are you working on now?' : 'Add task...'}
                 className={cn(
-                  'flex-1 bg-transparent text-sm outline-none placeholder:text-[hsl(var(--muted-foreground))]',
-                  block?.completed && 'line-through text-[hsl(var(--muted-foreground))]'
+                  'flex-1 bg-transparent text-[15px] outline-none placeholder:text-[hsl(var(--muted-foreground)/0.5)]',
+                  block?.completed && 'line-through text-[hsl(var(--muted-foreground))]',
+                  isCurrent && 'placeholder:text-[hsl(var(--primary)/0.5)]'
                 )}
               />
             </motion.div>
@@ -134,9 +156,11 @@ export function TimeBlocks({
       </AnimatePresence>
 
       {/* Expand/collapse button */}
-      <button
+      <motion.button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-center gap-2 py-2 text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors haptic"
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
+        className="w-full flex items-center justify-center gap-2 py-3 text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors haptic rounded-xl hover:bg-[hsl(var(--muted)/0.5)]"
       >
         {expanded ? (
           <>
@@ -149,7 +173,7 @@ export function TimeBlocks({
             Show all hours ({hours.length})
           </>
         )}
-      </button>
+      </motion.button>
     </div>
   );
 }

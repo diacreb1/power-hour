@@ -9,32 +9,45 @@ interface CardProps {
   variant?: 'default' | 'gold' | 'sage' | 'lavender';
   delay?: number;
   onClick?: () => void;
+  noPadding?: boolean;
 }
 
 const variants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 12, scale: 0.98 },
+  visible: { opacity: 1, y: 0, scale: 1 },
 };
 
 const variantStyles = {
   default: '',
-  gold: 'bg-[hsl(var(--gold-light))] border-[hsl(var(--gold)/0.2)]',
-  sage: 'bg-[hsl(var(--sage-light))] border-[hsl(var(--sage)/0.2)]',
-  lavender: 'bg-[hsl(var(--lavender-light))] border-[hsl(var(--lavender)/0.2)]',
+  gold: 'card-gold',
+  sage: 'card-sage',
+  lavender: 'card-lavender',
 };
 
-export function Card({ children, className, variant = 'default', delay = 0, onClick }: CardProps) {
+export function Card({ 
+  children, 
+  className, 
+  variant = 'default', 
+  delay = 0, 
+  onClick,
+  noPadding = false 
+}: CardProps) {
   return (
     <motion.div
       variants={variants}
       initial="hidden"
       animate="visible"
-      transition={{ duration: 0.4, delay, ease: 'easeOut' }}
+      transition={{ 
+        duration: 0.45, 
+        delay, 
+        ease: [0.25, 0.1, 0.25, 1] 
+      }}
       onClick={onClick}
       className={cn(
-        'card p-5',
+        'card',
+        !noPadding && 'p-6',
         variantStyles[variant],
-        onClick && 'cursor-pointer',
+        onClick && 'cursor-pointer active:scale-[0.98]',
         className
       )}
     >
@@ -48,21 +61,35 @@ interface CardHeaderProps {
   title: string;
   subtitle?: string;
   action?: React.ReactNode;
+  iconVariant?: 'primary' | 'gold' | 'sage' | 'lavender';
 }
 
-export function CardHeader({ icon, title, subtitle, action }: CardHeaderProps) {
+const iconVariantStyles = {
+  primary: 'icon-badge-primary',
+  gold: 'icon-badge-gold',
+  sage: 'icon-badge-sage',
+  lavender: 'icon-badge-lavender',
+};
+
+export function CardHeader({ 
+  icon, 
+  title, 
+  subtitle, 
+  action,
+  iconVariant = 'primary' 
+}: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between mb-4">
-      <div className="flex items-center gap-3">
+    <div className="flex items-start justify-between mb-5">
+      <div className="flex items-center gap-4">
         {icon && (
-          <div className="w-10 h-10 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center text-[hsl(var(--primary))]">
+          <div className={cn('icon-badge', iconVariantStyles[iconVariant])}>
             {icon}
           </div>
         )}
         <div>
-          <h3 className="font-semibold text-base">{title}</h3>
+          <h3 className="font-semibold text-[17px] tracking-tight">{title}</h3>
           {subtitle && (
-            <p className="text-sm text-[hsl(var(--muted-foreground))]">{subtitle}</p>
+            <p className="text-sm text-[hsl(var(--muted-foreground))] mt-0.5">{subtitle}</p>
           )}
         </div>
       </div>
@@ -82,4 +109,9 @@ export function CardSection({ children, className }: CardSectionProps) {
       {children}
     </div>
   );
+}
+
+// Decorative divider for cards
+export function CardDivider() {
+  return <div className="divider" />;
 }

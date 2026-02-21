@@ -24,8 +24,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#121418' },
+    { media: '(prefers-color-scheme: light)', color: '#FDFCFB' },
+    { media: '(prefers-color-scheme: dark)', color: '#0D0F14' },
   ],
   viewportFit: 'cover',
 };
@@ -38,6 +38,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Preload premium fonts for better performance */}
+        <link 
+          rel="preconnect" 
+          href="https://fonts.googleapis.com" 
+        />
+        <link 
+          rel="preconnect" 
+          href="https://fonts.gstatic.com" 
+          crossOrigin="anonymous" 
+        />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -46,7 +56,7 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body className="antialiased">
-        <div className="max-w-lg mx-auto relative">
+        <div className="max-w-lg mx-auto relative min-h-screen">
           {children}
           <BottomNav />
         </div>

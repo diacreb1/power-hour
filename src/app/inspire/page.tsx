@@ -84,18 +84,20 @@ export default function InspirePage() {
   return (
     <div className="min-h-screen pb-28">
       <Header title="Inspire" subtitle="Daily scripture & wisdom">
-        <button
+        <motion.button
           onClick={() => setShowSaved(!showSaved)}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors haptic',
+            'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 haptic',
             showSaved
-              ? 'bg-[hsl(var(--primary))] text-white'
+              ? 'bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.9)] text-white shadow-[0_2px_8px_hsl(var(--primary)/0.3)]'
               : 'bg-[hsl(var(--muted))]'
           )}
         >
           <Heart className={cn('w-4 h-4', showSaved && 'fill-current')} />
           {savedVerses.length}
-        </button>
+        </motion.button>
       </Header>
 
       <main className="px-5 space-y-6">
@@ -103,74 +105,83 @@ export default function InspirePage() {
         {!showSaved && (
           <motion.div
             key={currentVerse.reference}
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <Card
               variant="gold"
-              className="relative overflow-hidden min-h-[280px] flex flex-col"
+              className="relative overflow-hidden min-h-[300px] flex flex-col"
             >
-              {/* Decorative background */}
-              <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[hsl(var(--gold)/0.15)] to-transparent rounded-bl-full" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[hsl(var(--gold)/0.1)] to-transparent rounded-tr-full" />
+              {/* Decorative backgrounds */}
+              <div className="absolute top-0 right-0 w-56 h-56 bg-gradient-to-bl from-[hsl(var(--gold)/0.12)] to-transparent rounded-bl-full" />
+              <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-[hsl(var(--gold)/0.08)] to-transparent rounded-tr-full" />
+              <div className="absolute top-8 right-8 w-16 h-px bg-gradient-to-r from-[hsl(var(--gold)/0.4)] to-transparent" />
 
               <div className="relative z-10 flex-1 flex flex-col">
                 {/* Theme badge */}
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2.5 mb-5">
                   <Sparkles className="w-5 h-5 text-[hsl(var(--gold))]" />
-                  <span className="text-sm font-medium text-[hsl(var(--gold))] capitalize">
+                  <span className="text-sm font-semibold text-[hsl(var(--gold))] capitalize tracking-wide">
                     {currentVerse.theme}
                   </span>
                 </div>
 
-                {/* Verse */}
-                <blockquote className="flex-1 text-xl leading-relaxed font-light italic text-[hsl(var(--foreground))]">
+                {/* Verse - Large elegant serif typography */}
+                <blockquote className="flex-1 scripture-text text-[24px] leading-[1.45] text-[hsl(var(--foreground))]">
                   &ldquo;{currentVerse.verse}&rdquo;
                 </blockquote>
 
+                {/* Decorative divider */}
+                <div className="divider-ornate my-5">
+                  <span className="ornament">✦</span>
+                </div>
+
                 {/* Reference */}
-                <p className="text-base font-semibold text-[hsl(var(--foreground))] mt-4">
-                  — {currentVerse.reference}
+                <p className="text-lg font-semibold text-[hsl(var(--foreground)/0.85)] tracking-tight">
+                  {currentVerse.reference}
                 </p>
               </div>
             </Card>
 
-            {/* Action buttons */}
-            <div className="flex items-center justify-center gap-4 mt-4">
+            {/* Action buttons - Premium styling */}
+            <div className="flex items-center justify-center gap-3 mt-5">
               <motion.button
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={getRandomVerse}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[hsl(var(--muted))] hover:bg-[hsl(var(--muted-foreground)/0.1)] transition-colors haptic"
+                className="flex items-center gap-2.5 px-5 py-3.5 rounded-2xl bg-[hsl(var(--muted))] hover:bg-[hsl(var(--muted-foreground)/0.08)] transition-all duration-300 haptic shadow-sm"
               >
                 <RefreshCw className="w-5 h-5" />
-                <span className="text-sm font-medium">New Verse</span>
+                <span className="text-sm font-semibold">New Verse</span>
               </motion.button>
 
               <motion.button
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={saveVerse}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-3 rounded-xl transition-colors haptic',
+                  'flex items-center gap-2.5 px-5 py-3.5 rounded-2xl transition-all duration-300 haptic',
                   isSaved
-                    ? 'bg-[hsl(var(--primary))] text-white'
-                    : 'bg-[hsl(var(--muted))]'
+                    ? 'bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.9)] text-white shadow-[0_4px_12px_hsl(var(--primary)/0.3)]'
+                    : 'bg-[hsl(var(--muted))] shadow-sm'
                 )}
               >
                 <Heart className={cn('w-5 h-5', isSaved && 'fill-current')} />
-                <span className="text-sm font-medium">
+                <span className="text-sm font-semibold">
                   {isSaved ? 'Saved' : 'Save'}
                 </span>
               </motion.button>
 
               {typeof navigator !== 'undefined' && 'share' in navigator && (
                 <motion.button
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={shareVerse}
-                  className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[hsl(var(--muted))] hover:bg-[hsl(var(--muted-foreground)/0.1)] transition-colors haptic"
+                  className="flex items-center gap-2.5 px-5 py-3.5 rounded-2xl bg-[hsl(var(--muted))] hover:bg-[hsl(var(--muted-foreground)/0.08)] transition-all duration-300 haptic shadow-sm"
                 >
                   <Share2 className="w-5 h-5" />
-                  <span className="text-sm font-medium">Share</span>
+                  <span className="text-sm font-semibold">Share</span>
                 </motion.button>
               )}
             </div>
@@ -179,37 +190,39 @@ export default function InspirePage() {
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[hsl(var(--muted-foreground))]" />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[hsl(var(--muted-foreground))]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search verses..."
-            className="input pl-12"
+            className="input pl-14"
           />
         </div>
 
         {/* Theme filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+        <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
           {themes.map((theme) => (
-            <button
+            <motion.button
               key={theme}
               onClick={() => setSearchQuery(theme)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               className={cn(
-                'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors haptic',
+                'px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 haptic',
                 searchQuery === theme
-                  ? 'bg-[hsl(var(--primary))] text-white'
-                  : 'bg-[hsl(var(--muted))] hover:bg-[hsl(var(--muted-foreground)/0.1)]'
+                  ? 'bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.9)] text-white shadow-[0_2px_8px_hsl(var(--primary)/0.25)]'
+                  : 'bg-[hsl(var(--muted))] hover:bg-[hsl(var(--muted-foreground)/0.08)]'
               )}
             >
               {theme}
-            </button>
+            </motion.button>
           ))}
         </div>
 
         {/* Saved Verses or All Verses */}
         <section>
-          <h2 className="text-lg font-semibold mb-4">
+          <h2 className="text-lg font-semibold mb-4 tracking-tight">
             {showSaved ? 'Saved Verses' : 'All Verses'}
           </h2>
 
@@ -217,8 +230,10 @@ export default function InspirePage() {
             <AnimatePresence mode="popLayout">
               {showSaved ? (
                 savedVerses.length === 0 ? (
-                  <Card className="text-center py-8">
-                    <Heart className="w-12 h-12 text-[hsl(var(--muted-foreground))] mx-auto mb-3" />
+                  <Card className="text-center py-10">
+                    <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-[hsl(var(--muted))] flex items-center justify-center">
+                      <Heart className="w-7 h-7 text-[hsl(var(--muted-foreground))]" />
+                    </div>
                     <p className="text-[hsl(var(--muted-foreground))]">
                       No saved verses yet
                     </p>
@@ -227,13 +242,13 @@ export default function InspirePage() {
                   savedVerses.map((scripture, index) => (
                     <motion.div
                       key={scripture.id}
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -50 }}
-                      transition={{ delay: index * 0.05 }}
+                      exit={{ opacity: 0, x: -40 }}
+                      transition={{ delay: index * 0.04, duration: 0.35 }}
                     >
                       <Card
-                        className="cursor-pointer"
+                        className="cursor-pointer active:scale-[0.98]"
                         onClick={() => {
                           setCurrentVerse({
                             verse: scripture.verse,
@@ -243,13 +258,15 @@ export default function InspirePage() {
                           setShowSaved(false);
                         }}
                       >
-                        <div className="flex items-start gap-3">
-                          <BookOpen className="w-5 h-5 text-[hsl(var(--gold))] flex-shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-4">
+                          <div className="icon-badge icon-badge-gold flex-shrink-0">
+                            <BookOpen className="w-5 h-5" />
+                          </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm leading-relaxed line-clamp-2">
+                            <p className="scripture-text text-[15px] leading-relaxed line-clamp-2">
                               &ldquo;{scripture.verse}&rdquo;
                             </p>
-                            <p className="text-xs text-[hsl(var(--muted-foreground))] mt-1 font-medium">
+                            <p className="text-xs text-[hsl(var(--muted-foreground))] mt-2 font-semibold tracking-wide">
                               — {scripture.reference}
                             </p>
                           </div>
@@ -262,25 +279,27 @@ export default function InspirePage() {
                 filteredVerses.map((verse, index) => (
                   <motion.div
                     key={`${verse.reference}-${index}`}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03 }}
+                    transition={{ delay: index * 0.025, duration: 0.35 }}
                   >
                     <Card
-                      className="cursor-pointer"
+                      className="cursor-pointer active:scale-[0.98]"
                       onClick={() => setCurrentVerse(verse)}
                     >
-                      <div className="flex items-start gap-3">
-                        <BookOpen className="w-5 h-5 text-[hsl(var(--gold))] flex-shrink-0 mt-0.5" />
+                      <div className="flex items-start gap-4">
+                        <div className="icon-badge icon-badge-gold flex-shrink-0">
+                          <BookOpen className="w-5 h-5" />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm leading-relaxed line-clamp-2">
+                          <p className="scripture-text text-[15px] leading-relaxed line-clamp-2">
                             &ldquo;{verse.verse}&rdquo;
                           </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <p className="text-xs text-[hsl(var(--muted-foreground))] font-medium">
+                          <div className="flex items-center gap-2.5 mt-2">
+                            <p className="text-xs text-[hsl(var(--muted-foreground))] font-semibold">
                               — {verse.reference}
                             </p>
-                            <span className="px-2 py-0.5 bg-[hsl(var(--muted))] rounded text-[10px] text-[hsl(var(--muted-foreground))] capitalize">
+                            <span className="px-2.5 py-1 bg-[hsl(var(--muted))] rounded-lg text-[10px] font-semibold text-[hsl(var(--muted-foreground))] capitalize tracking-wide">
                               {verse.theme}
                             </span>
                           </div>

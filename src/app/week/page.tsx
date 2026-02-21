@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Check, Circle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Circle, Calendar, Sparkles, Heart } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Card } from '@/components/Card';
 import { getWeekDates, formatDayName, formatShortDate, cn, getDateString } from '@/lib/utils';
@@ -46,25 +46,29 @@ export default function WeekPage() {
   return (
     <div className="min-h-screen pb-28">
       <Header title="Week View" subtitle={format(weekStart, 'MMMM yyyy')}>
-        <button
+        <motion.button
           onClick={goToToday}
-          className="px-3 py-1.5 text-sm font-medium text-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] rounded-lg haptic"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="px-4 py-2 text-sm font-semibold text-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] rounded-xl haptic transition-all duration-300 hover:bg-[hsl(var(--primary)/0.15)]"
         >
           Today
-        </button>
+        </motion.button>
       </Header>
 
-      <main className="px-5 space-y-5">
+      <main className="px-5 space-y-6">
         {/* Week Navigation */}
-        <div className="flex items-center justify-between">
-          <button
+        <div className="flex items-center justify-between gap-2">
+          <motion.button
             onClick={goToPreviousWeek}
-            className="p-2 rounded-xl hover:bg-[hsl(var(--muted))] transition-colors haptic"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2.5 rounded-xl hover:bg-[hsl(var(--muted))] transition-colors haptic"
           >
             <ChevronLeft className="w-5 h-5" />
-          </button>
+          </motion.button>
 
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
             {weekDates.map((date) => {
               const dateStr = getDateString(date);
               const plan = plans.get(dateStr);
@@ -79,27 +83,33 @@ export default function WeekPage() {
                 <motion.button
                   key={dateStr}
                   onClick={() => setSelectedDate(date)}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.95 }}
                   className={cn(
-                    'flex flex-col items-center py-2 px-3 rounded-2xl transition-all haptic min-w-[44px]',
+                    'flex flex-col items-center py-2.5 px-3.5 rounded-2xl transition-all duration-300 haptic min-w-[48px]',
                     isSelected
-                      ? 'bg-[hsl(var(--primary))] text-white'
+                      ? 'bg-gradient-to-b from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.9)] text-white shadow-[0_4px_12px_hsl(var(--primary)/0.3)]'
                       : isToday(date)
-                      ? 'bg-[hsl(var(--primary)/0.1)]'
+                      ? 'bg-[hsl(var(--primary)/0.1)] ring-1 ring-[hsl(var(--primary)/0.2)]'
                       : 'hover:bg-[hsl(var(--muted))]'
                   )}
                 >
-                  <span className="text-[10px] font-medium uppercase opacity-70">
+                  <span className={cn(
+                    'text-[10px] font-semibold uppercase tracking-wider',
+                    isSelected ? 'opacity-80' : 'opacity-60'
+                  )}>
                     {formatDayName(date)}
                   </span>
-                  <span className="text-lg font-semibold">{format(date, 'd')}</span>
+                  <span className="text-xl font-bold mt-0.5">{format(date, 'd')}</span>
                   
                   {/* Indicator dot */}
-                  <div className="h-1.5 mt-1">
+                  <div className="h-2 mt-1.5 flex items-center justify-center">
                     {allComplete ? (
-                      <div
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
                         className={cn(
-                          'w-1.5 h-1.5 rounded-full',
+                          'w-2 h-2 rounded-full',
                           isSelected ? 'bg-white' : 'bg-[hsl(var(--sage))]'
                         )}
                       />
@@ -107,7 +117,7 @@ export default function WeekPage() {
                       <div
                         className={cn(
                           'w-1.5 h-1.5 rounded-full',
-                          isSelected ? 'bg-white/60' : 'bg-[hsl(var(--muted-foreground)/0.3)]'
+                          isSelected ? 'bg-white/60' : 'bg-[hsl(var(--muted-foreground)/0.4)]'
                         )}
                       />
                     ) : null}
@@ -117,47 +127,58 @@ export default function WeekPage() {
             })}
           </div>
 
-          <button
+          <motion.button
             onClick={goToNextWeek}
-            className="p-2 rounded-xl hover:bg-[hsl(var(--muted))] transition-colors haptic"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2.5 rounded-xl hover:bg-[hsl(var(--muted))] transition-colors haptic"
           >
             <ChevronRight className="w-5 h-5" />
-          </button>
+          </motion.button>
         </div>
 
         {/* Selected Day Summary */}
         <Card>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="font-semibold text-lg">
+              <h3 className="font-semibold text-xl tracking-tight">
                 {format(selectedDate, 'EEEE, MMMM d')}
               </h3>
               {isToday(selectedDate) && (
-                <span className="text-xs text-[hsl(var(--primary))] font-medium">Today</span>
+                <span className="text-xs text-[hsl(var(--primary))] font-semibold mt-0.5 inline-block">Today</span>
               )}
             </div>
             
             {totalPriorities > 0 && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-[hsl(var(--muted))] rounded-full">
-                <span className="text-sm font-medium">
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-xl',
+                  completedPriorities === totalPriorities 
+                    ? 'bg-[hsl(var(--sage)/0.15)]'
+                    : 'bg-[hsl(var(--muted))]'
+                )}
+              >
+                <span className="text-sm font-bold tabular-nums">
                   {completedPriorities}/{totalPriorities}
                 </span>
                 {completedPriorities === totalPriorities && (
-                  <Check className="w-4 h-4 text-[hsl(var(--sage))]" />
+                  <Check className="w-4 h-4 text-[hsl(var(--sage))]" strokeWidth={3} />
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
 
           {selectedPlan ? (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {/* Morning Intention */}
               {selectedPlan.morningIntention && (
-                <div className="p-3 bg-[hsl(var(--muted))] rounded-xl">
-                  <p className="text-xs font-medium text-[hsl(var(--muted-foreground))] mb-1">
+                <div className="p-4 bg-gradient-to-r from-[hsl(var(--gold-light))] to-[hsl(var(--gold-medium)/0.3)] rounded-2xl border border-[hsl(var(--gold)/0.1)]">
+                  <p className="text-xs font-semibold text-[hsl(var(--gold))] mb-2 tracking-wide">
                     Intention
                   </p>
-                  <p className="text-sm leading-relaxed line-clamp-2">
+                  <p className="text-[15px] leading-relaxed line-clamp-2">
                     {selectedPlan.morningIntention}
                   </p>
                 </div>
@@ -165,44 +186,51 @@ export default function WeekPage() {
 
               {/* Priorities */}
               {selectedPlan.priorities.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-[hsl(var(--muted-foreground))]">
+                <div className="space-y-2.5">
+                  <p className="text-xs font-semibold text-[hsl(var(--muted-foreground))] tracking-wide">
                     Priorities
                   </p>
-                  {selectedPlan.priorities.map((priority, index) => (
-                    <div
+                  {selectedPlan.priorities.map((priority) => (
+                    <motion.div
                       key={priority.id}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
                       className={cn(
-                        'flex items-center gap-3 p-2 rounded-lg',
-                        priority.completed && 'opacity-60'
+                        'flex items-center gap-3 p-3 rounded-xl',
+                        priority.completed 
+                          ? 'bg-[hsl(var(--sage-light))]' 
+                          : 'bg-[hsl(var(--muted)/0.5)]'
                       )}
                     >
                       {priority.completed ? (
-                        <Check className="w-4 h-4 text-[hsl(var(--sage))]" />
+                        <div className="w-5 h-5 rounded-lg bg-[hsl(var(--sage))] flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                        </div>
                       ) : (
-                        <Circle className="w-4 h-4 text-[hsl(var(--muted-foreground))]" />
+                        <Circle className="w-5 h-5 text-[hsl(var(--muted-foreground))]" />
                       )}
                       <span
                         className={cn(
-                          'text-sm',
+                          'text-[15px]',
                           priority.completed && 'line-through text-[hsl(var(--muted-foreground))]'
                         )}
                       >
                         {priority.text}
                       </span>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
 
               {/* Gratitude */}
               {selectedPlan.gratitude.length > 0 && (
-                <div className="p-3 bg-[hsl(var(--sage-light))] rounded-xl">
-                  <p className="text-xs font-medium text-[hsl(var(--sage))] mb-2">
+                <div className="p-4 bg-gradient-to-r from-[hsl(var(--sage-light))] to-[hsl(var(--sage-medium)/0.3)] rounded-2xl border border-[hsl(var(--sage)/0.1)]">
+                  <p className="text-xs font-semibold text-[hsl(var(--sage))] mb-2 tracking-wide flex items-center gap-1.5">
+                    <Heart className="w-3 h-3 fill-current" />
                     Gratitude
                   </p>
                   {selectedPlan.gratitude.map((item, i) => (
-                    <p key={i} className="text-sm leading-relaxed">
+                    <p key={i} className="text-[15px] leading-relaxed">
                       • {item}
                     </p>
                   ))}
@@ -210,10 +238,13 @@ export default function WeekPage() {
               )}
             </div>
           ) : (
-            <div className="text-center py-8 text-[hsl(var(--muted-foreground))]">
-              <p className="text-sm">No plan for this day</p>
+            <div className="text-center py-10">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-[hsl(var(--muted))] flex items-center justify-center">
+                <Calendar className="w-7 h-7 text-[hsl(var(--muted-foreground))]" />
+              </div>
+              <p className="text-[15px] text-[hsl(var(--muted-foreground))]">No plan for this day</p>
               {isToday(selectedDate) && (
-                <p className="text-xs mt-1">
+                <p className="text-xs text-[hsl(var(--muted-foreground))] mt-1.5">
                   Start planning on the Today tab
                 </p>
               )}
@@ -222,33 +253,48 @@ export default function WeekPage() {
         </Card>
 
         {/* Week Stats */}
-        <Card className="bg-gradient-to-br from-[hsl(var(--primary)/0.05)] to-transparent">
-          <h3 className="font-semibold mb-4">This Week</h3>
+        <Card className="bg-gradient-to-br from-[hsl(var(--primary)/0.04)] via-transparent to-[hsl(var(--gold)/0.04)]">
+          <h3 className="font-semibold text-lg tracking-tight mb-5">This Week</h3>
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-[hsl(var(--primary))]">
+            <motion.div 
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-center p-4 rounded-2xl bg-[hsl(var(--primary)/0.08)]"
+            >
+              <p className="text-3xl font-bold text-gradient-primary">
                 {Array.from(plans.values()).reduce(
                   (acc, p) => acc + p.priorities.filter((pr) => pr.completed).length,
                   0
                 )}
               </p>
-              <p className="text-xs text-[hsl(var(--muted-foreground))]">Completed</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-[hsl(var(--gold))]">
+              <p className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-1">Completed</p>
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="text-center p-4 rounded-2xl bg-[hsl(var(--gold)/0.1)]"
+            >
+              <p className="text-3xl font-bold text-gradient-gold">
                 {Array.from(plans.values()).filter((p) => p.morningIntention).length}
               </p>
-              <p className="text-xs text-[hsl(var(--muted-foreground))]">Days Planned</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-[hsl(var(--sage))]">
+              <p className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-1">Days Planned</p>
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-center p-4 rounded-2xl bg-[hsl(var(--sage)/0.1)]"
+            >
+              <p className="text-3xl font-bold" style={{ color: 'hsl(var(--sage))' }}>
                 {Array.from(plans.values()).reduce(
                   (acc, p) => acc + p.gratitude.length,
                   0
                 )}
               </p>
-              <p className="text-xs text-[hsl(var(--muted-foreground))]">Gratitudes</p>
-            </div>
+              <p className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-1">Gratitudes</p>
+            </motion.div>
           </div>
         </Card>
       </main>
